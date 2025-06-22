@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan Hair Care - Where Beauty Meets Art</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'luxury': ['Playfair Display', 'serif'],
+                        'modern': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'luxury-gold': '#D4AF37',
+                        'luxury-rose': '#E8B4B8',
+                        'luxury-dark': '#1A1A1A',
+                        'luxury-purple': '#6B46C1',
+                        'luxury-cream': '#F7F3E9',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'shimmer': 'shimmer 2s linear infinite',
+                        'fadeInUp': 'fadeInUp 0.8s ease-out',
+                        'slideIn': 'slideIn 0.6s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+            to { box-shadow: 0 0 30px rgba(212, 175, 55, 0.8); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #D4AF37, #E8B4B8, #6B46C1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .luxury-shadow {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 40px rgba(212, 175, 55, 0.1);
+        }
+        .cursor-trail {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.6), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D1B69 50%, #1A1A1A 100%);
+        }
+        .service-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        .floating-element:nth-child(2) { animation-delay: -2s; }
+        .floating-element:nth-child(3) { animation-delay: -4s; }
+    </style>
+</head>
+<body class="bg-luxury-dark text-white font-modern overflow-x-hidden">
+    <!-- Cursor Trail -->
+    <div class="cursor-trail" id="cursorTrail"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div class="font-luxury text-2xl font-bold gradient-text">Ryan Hair Care</div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="nav-link text-white hover:text-luxury-gold transition-colors duration-300">Home</a>
+                    <a href="#services" class="nav-link text-white hover:text-luxury-gold transition-colors duration-300">Services</a>
+                    <a href="#portfolio" class="nav-link text-white hover:text-luxury-gold transition-colors duration-300">Portfolio</a>
+                    <a href="#team" class="nav-link text-white hover:text-luxury-gold transition-colors duration-300">Team</a>
+                    <a href="#testimonials" class="nav-link text-white hover:text-luxury-gold transition-colors duration-300">Reviews</a>
+                    <a href="#contact" class="nav-link text-white hover:text-luxury-gold transition-colors duration-300">Contact</a>
+                </div>
+                <button class="bg-luxury-gold text-luxury-dark px-6 py-2 rounded-full font-semibold hover:bg-yellow-400 transition-all duration-300 hover:scale-105">
+                    Book Now
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen hero-bg relative overflow-hidden">
+        <div id="threejs-container" class="absolute inset-0 z-0"></div>
+        <div class="relative z-10 flex items-center justify-center min-h-screen">
+            <div class="text-center max-w-4xl mx-auto px-6">
+                <div class="floating-element">
+                    <h1 class="font-luxury text-6xl md:text-8xl font-bold mb-6 gradient-text">
+                        Where Beauty
+                        <br>
+                        Meets Art
+                    </h1>
+                </div>
+                <div class="floating-element">
+                    <p class="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
+                        Transform your look with our premium hair care services. 
+                        <br>Experience luxury, creativity, and unmatched expertise.
+                    </p>
+                </div>
+                <div class="floating-element flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="bg-luxury-gold text-luxury-dark px-8 py-4 rounded-full font-semibold text-lg hover:bg-yellow-400 transition-all duration-300 hover:scale-105 animate-glow">
+                        Discover Your Style
+                    </button>
+                    <button class="border-2 border-luxury-gold text-luxury-gold px-8 py-4 rounded-full font-semibold text-lg hover:bg-luxury-gold hover:text-luxury-dark transition-all duration-300">
+                        View Portfolio
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <div class="w-6 h-10 border-2 border-luxury-gold rounded-full flex justify-center">
+                <div class="w-1 h-3 bg-luxury-gold rounded-full mt-2 animate-pulse"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-gradient-to-b from-luxury-dark to-gray-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-luxury text-5xl font-bold gradient-text mb-6">Our Signature Services</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Each service is crafted with precision, passion, and the finest products to deliver exceptional results.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="service-card luxury-shadow bg-gradient-to-br from-luxury-purple to-purple-900 p-8 rounded-2xl">
+                    <div class="w-16 h-16 bg-luxury-gold rounded-full flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-luxury-dark rounded-full"></div>
+                    </div>
+                    <h3 class="font-luxury text-2xl font-bold mb-4 text-luxury-gold">Precision Cuts</h3>
+                    <p class="text-gray-200 mb-6">Master-crafted cuts that complement your unique features and lifestyle.</p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li>• Consultation & Face Shape Analysis</li>
+                        <li>• Precision Cutting Techniques</li>
+                        <li>• Personalized Styling</li>
+                        <li>• Maintenance Guidance</li>
+                    </ul>
+                </div>
+
+                <div class="service-card luxury-shadow bg-gradient-to-br from-luxury-rose to-pink-900 p-8 rounded-2xl">
+                    <div class="w-16 h-16 bg-luxury-gold rounded-full flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-luxury-dark rounded-full"></div>
+                    </div>
+                    <h3 class="font-luxury text-2xl font-bold mb-4 text-luxury-gold">Color Artistry</h3>
+                    <p class="text-gray-200 mb-6">From subtle highlights to bold transformations using premium color systems.</p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li>• Color Consultation</li>
+                        <li>• Balayage & Highlights</li>
+                        <li>• Creative Color Techniques</li>
+                        <li>• Color Correction</li>
+                    </ul>
+                </div>
+
+                <div class="service-card luxury-shadow bg-gradient-to-br from-luxury-gold to-yellow-800 p-8 rounded-2xl">
+                    <div class="w-16 h-16 bg-luxury-dark rounded-full flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-luxury-gold rounded-full"></div>
+                    </div>
+                    <h3 class="font-luxury text-2xl font-bold mb-4 text-luxury-dark">Luxury Treatments</h3>
+                    <p class="text-gray-800 mb-6">Restorative treatments that nourish, repair, and protect your hair.</p>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li>• Deep Conditioning Treatments</li>
+                        <li>• Keratin Smoothing</li>
+                        <li>• Scalp Therapy</li>
+                        <li>• Hair Reconstruction</li>
+                    </ul>
+                </div>
+
+                <div class="service-card luxury-shadow bg-gradient-to-br from-indigo-800 to-blue-900 p-8 rounded-2xl">
+                    <div class="w-16 h-16 bg-luxury-gold rounded-full flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-luxury-dark rounded-full"></div>
+                    </div>
+                    <h3 class="font-luxury text-2xl font-bold mb-4 text-luxury-gold">Bridal & Events</h3>
+                    <p class="text-gray-200 mb-6">Make your special day unforgettable with our bridal and event styling.</p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li>• Bridal Consultations</li>
+                        <li>• Trial Sessions</li>
+                        <li>• On-Location Services</li>
+                        <li>• Bridal Party Packages</li>
+                    </ul>
+                </div>
+
+                <div class="service-card luxury-shadow bg-gradient-to-br from-emerald-800 to-green-900 p-8 rounded-2xl">
+                    <div class="w-16 h-16 bg-luxury-gold rounded-full flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-luxury-dark rounded-full"></div>
+                    </div>
+                    <h3 class="font-luxury text-2xl font-bold mb-4 text-luxury-gold">Extensions & Styling</h3>
+                    <p class="text-gray-200 mb-6">Premium extensions and advanced styling for length, volume, and versatility.</p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li>• Tape-in Extensions</li>
+                        <li>• Clip-in Extensions</li>
+                        <li>• Updo Styling</li>
+                        <li>• Special Occasion Looks</li>
+                    </ul>
+                </div>
+
+                <div class="service-card luxury-shadow bg-gradient-to-br from-red-800 to-pink-900 p-8 rounded-2xl">
+                    <div class="w-16 h-16 bg-luxury-gold rounded-full flex items-center justify-center mb-6">
+                        <div class="w-8 h-8 bg-luxury-dark rounded-full"></div>
+                    </div>
+                    <h3 class="font-luxury text-2xl font-bold mb-4 text-luxury-gold">VIP Experience</h3>
+                    <p class="text-gray-200 mb-6">Exclusive one-on-one sessions with our master stylists in a private setting.</p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li>• Private Consultation Suite</li>
+                        <li>• Complimentary Refreshments</li>
+                        <li>• Extended Session Time</li>
+                        <li>• Personalized Hair Care Kit</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-luxury text-5xl font-bold gradient-text mb-6">Our Masterpieces</h2>
+                <p class="text-xl text-gray-300">Witness the artistry and transformation</p>
+            </div>
+            
+            <div id="portfolio-canvas" class="w-full h-96 rounded-2xl overflow-hidden mb-8"></div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-luxury-purple h-32 rounded-xl luxury-shadow hover:scale-105 transition-transform duration-300"></div>
+                <div class="bg-luxury-rose h-32 rounded-xl luxury-shadow hover:scale-105 transition-transform duration-300"></div>
+                <div class="bg-luxury-gold h-32 rounded-xl luxury-shadow hover:scale-105 transition-transform duration-300"></div>
+                <div class="bg-gradient-to-br from-indigo-600 to-purple-600 h-32 rounded-xl luxury-shadow hover:scale-105 transition-transform duration-300"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-20 bg-luxury-dark">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-luxury text-5xl font-bold gradient-text mb-6">Meet Our Artists</h2>
+                <p class="text-xl text-gray-300">Passionate professionals dedicated to your beauty</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-48 h-48 bg-gradient-to-br from-luxury-gold to-luxury-rose rounded-full mx-auto mb-6 luxury-shadow"></div>
+                    <h3 class="font-luxury text-2xl font-bold text-luxury-gold mb-2">Ryan Martinez</h3>
+                    <p class="text-luxury-rose font-semibold mb-4">Master Stylist & Founder</p>
+                    <p class="text-gray-300">15+ years of experience in luxury hair care and color artistry.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-48 h-48 bg-gradient-to-br from-luxury-purple to-luxury-gold rounded-full mx-auto mb-6 luxury-shadow"></div>
+                    <h3 class="font-luxury text-2xl font-bold text-luxury-gold mb-2">Sarah Chen</h3>
+                    <p class="text-luxury-rose font-semibold mb-4">Color Specialist</p>
+                    <p class="text-gray-300">Expert in balayage, ombre, and creative color transformations.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-48 h-48 bg-gradient-to-br from-luxury-rose to-luxury-purple rounded-full mx-auto mb-6 luxury-shadow"></div>
+                    <h3 class="font-luxury text-2xl font-bold text-luxury-gold mb-2">Michael Thompson</h3>
+                    <p class="text-luxury-rose font-semibold mb-4">Precision Cut Specialist</p>
+                    <p class="text-gray-300">Renowned for innovative cutting techniques and men's grooming.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-gradient-to-r from-luxury-purple to-luxury-rose">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-luxury text-5xl font-bold text-white mb-6">What Our Clients Say</h2>
+                <p class="text-xl text-gray-100">Real stories from satisfied clients</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-effect p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-luxury-gold rounded-full mr-4"></div>
+                        <div>
+                            <h4 class="font-semibold text-white">Emma Wilson</h4>
+                            <div class="flex text-luxury-gold">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-100">"Absolutely incredible experience! Ryan transformed my hair beyond my wildest dreams. The attention to detail and luxurious atmosphere made me feel like royalty."</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-luxury-gold rounded-full mr-4"></div>
+                        <div>
+                            <h4 class="font-semibold text-white">David Rodriguez</h4>
+                            <div class="flex text-luxury-gold">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-100">"Best haircut I've ever had! The team's expertise and professionalism are unmatched. I've never felt more confident about my appearance."</p>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-luxury-gold rounded-full mr-4"></div>
+                        <div>
+                            <h4 class="font-semibold text-white">Lisa Park</h4>
+                            <div class="flex text-luxury-gold">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-100">"The color correction Sarah did was miraculous! She saved my hair from a previous salon disaster and made it look absolutely stunning."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-luxury text-5xl font-bold gradient-text mb-6">Investment in Beauty</h2>
+                <p class="text-xl text-gray-300">Transparent pricing for premium services</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-luxury-dark border-2 border-gray-700 p-8 rounded-2xl luxury-shadow">
+                    <h3 class="font-luxury text-2xl font-bold text-luxury-gold mb-4">Essential</h3>
+                    <div class="text-4xl font-bold text-white mb-6">$150<span class="text-lg text-gray-400">/session</span></div>
+                    <ul class="space-y-3 text-gray-300 mb-8">
+                        <li>• Precision Cut</li>
+                        <li>• Wash & Style</li>
+                        <li>• Basic Styling</li>
+                        <li>• Hair Care Consultation</li>
+                    </ul>
+                    <button class="w-full bg-luxury-gold text-luxury-dark py-3 rounded-full font-semibold hover:bg-yellow-400 transition-colors duration-300">
+                        Book Essential
+                    </button>
+                </div>
+                
+                <div class="bg-luxury-dark border-2 border-luxury-gold p-8 rounded-2xl luxury-shadow scale-105">
+                    <div class="text-center mb-4">
+                        <span class="bg-luxury-gold text-luxury-dark px-4 py-1 rounded-full text-sm font-semibold">Most Popular</span>
+                    </div>
+                    <h3 class="font-luxury text-2xl font-bold text-luxury-gold mb-4">Signature</h3>
+                    <div class="text-4xl font-bold text-white mb-6">$275<span class="text-lg text-gray-400">/session</span></div>
+                    <ul class="space-y-3 text-gray-300 mb-8">
+                        <li>• Everything in Essential</li>
+                        <li>• Color or Highlights</li>
+                        <li>• Deep Conditioning</li>
+                        <li>• Advanced Styling</li>
+                        <li>• Take-home Products</li>
+                    </ul>
+                    <button class="w-full bg-luxury-gold text-luxury-dark py-3 rounded-full font-semibold hover:bg-yellow-400 transition-colors duration-300">
+                        Book Signature
+                    </button>
+                </div>
+                
+                <div class="bg-luxury-dark border-2 border-gray-700 p-8 rounded-2xl luxury-shadow">
+                    <h3 class="font-luxury text-2xl font-bold text-luxury-gold mb-4">VIP Elite</h3>
+                    <div class="text-4xl font-bold text-white mb-6">$450<span class="text-lg text-gray-400">/session</span></div>
+                    <ul class="space-y-3 text-gray-300 mb-8">
+                        <li>• Everything in Signature</li>
+                        <li>• Private Suite Experience</li>
+                        <li>• Extended Session Time</li>
+                        <li>• Luxury Treatments</li>
+                        <li>• Personalized Hair Kit</li>
+                        <li>• Refreshments Included</li>
+                    </ul>
+                    <button class="w-full bg-luxury-gold text-luxury-dark py-3 rounded-full font-semibold hover:bg-yellow-400 transition-colors duration-300">
+                        Book VIP Elite
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-luxury-dark">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-luxury text-5xl font-bold gradient-text mb-6">Begin Your Transformation</h2>
+                <p class="text-xl text-gray-300">Contact us to schedule your luxury hair experience</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="font-luxury text-2xl font-bold text-luxury-gold mb-6">Get in Touch</h3>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-6 h-6 bg-luxury-gold rounded-full"></div>
+                            <span class="text-gray-300">123 Luxury Avenue, Beverly Hills, CA 90210</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-6 h-6 bg-luxury-gold rounded-full"></div>
+                            <span class="text-gray-300">(555) 123-HAIR</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-6 h-6 bg-luxury-gold rounded-full"></div>
+                            <span class="text-gray-300">hello@ryanhaircare.com</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-luxury-gold mb-4">Hours of Operation</h4>
+                        <div class="space-y-2 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>Monday - Friday</span>
+                                <span>9:00 AM - 8:00 PM</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Saturday</span>
+                                <span>8:00 AM - 6:00 PM</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Sunday</span>
+                                <span>10:00 AM - 5:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-effect p-8 rounded-2xl">
+                    <form class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="text" placeholder="First Name" class="w-full px-4 py-3 bg-luxury-dark border border-gray-600 rounded-lg text-white focus:border-luxury-gold focus:outline-none transition-colors duration-300">
+                            <input type="text" placeholder="Last Name" class="w-full px-4 py-3 bg-luxury-dark border border-gray-600 rounded-lg text-white focus:border-luxury-gold focus:outline-none transition-colors duration-300">
+                        </div>
+                        <input type="email" placeholder="Email Address" class="w-full px-4 py-3 bg-luxury-dark border border-gray-600 rounded-lg text-white focus:border-luxury-gold focus:outline-none transition-colors duration-300">
+                        <input type="tel" placeholder="Phone Number" class="w-full px-4 py-3 bg-luxury-dark border border-gray-600 rounded-lg text-white focus:border-luxury-gold focus:outline-none transition-colors duration-300">
+                        <select class="w-full px-4 py-3 bg-luxury-dark border border-gray-600 rounded-lg text-white focus:border-luxury-gold focus:outline-none transition-colors duration-300">
+                            <option>Select Service</option>
+                            <option>Precision Cut</option>
+                            <option>Color Artistry</option>
+                            <option>Luxury Treatment</option>
+                            <option>Bridal & Events</option>
+                            <option>VIP Experience</option>
+                        </select>
+                        <textarea placeholder="Tell us about your hair goals..." rows="4" class="w-full px-4 py-3 bg-luxury-dark border border-gray-600 rounded-lg text-white focus:border-luxury-gold focus:outline-none transition-colors duration-300"></textarea>
+                        <button type="submit" class="w-full
